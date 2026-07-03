@@ -820,14 +820,14 @@
                 </div>
                 <div class="form-group">
                   <label>{{ __('Paypal Client ID') }}</label>
-                  <input class="form-control" name="client_id" value="{{ $paypalInfo['client_id'] }}">
+                  <input class="form-control" type="password" name="client_id" value="" placeholder="Leave blank to keep current">
                   @if ($errors->has('client_id'))
                     <p class="mb-0 text-danger">{{ $errors->first('client_id') }}</p>
                   @endif
                 </div>
                 <div class="form-group">
                   <label>{{ __('Paypal Client Secret') }}</label>
-                  <input class="form-control" name="client_secret" value="{{ $paypalInfo['client_secret'] }}">
+                  <input class="form-control" type="password" name="client_secret" value="" placeholder="Leave blank to keep current">
                   @if ($errors->has('client_secret'))
                     <p class="mb-0 text-danger">{{ $errors->first('client_secret') }}</p>
                   @endif

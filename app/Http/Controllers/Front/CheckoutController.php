@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Coupon;
 use App\Models\Package;
+use App\Models\BasicSetting;
 use App\Models\Language;
 use App\Models\User\Menu;
 use App\Models\Membership;
@@ -538,14 +539,18 @@ class CheckoutController extends Controller
                 'permissions' => json_encode($features)
             ]);
 
+            $adminBs = BasicSetting::first();
             User\BasicSetting::create([
-                'base_color' => 'D3A971',
-                'language_id' => $lang->id,
-                'user_id' => $user->id,
-                'home_version' => 'slider',
-                'support_email' => $user->email,
-                'support_phone' => $user->phone,
-                'website_title' => $user->username,
+                'base_color'                  => 'D3A971',
+                'language_id'                 => $lang->id,
+                'user_id'                     => $user->id,
+                'home_version'                => 'slider',
+                'support_email'               => $user->email,
+                'support_phone'               => $user->phone,
+                'website_title'               => $user->username,
+                'is_recaptcha'                => $adminBs->is_recaptcha ?? 0,
+                'google_recaptcha_site_key'   => $adminBs->google_recaptcha_site_key ?? null,
+                'google_recaptcha_secret_key' => $adminBs->google_recaptcha_secret_key ?? null,
             ]);
             PageHeading::create([
                 'language_id' => $lang->id,

@@ -41,7 +41,7 @@
                     <div class="form-group mb-30">
                         @if ($bs->is_recaptcha == 1)
                             <div class="d-block mb-4">
-                                {!! NoCaptcha::renderJs() !!}
+                                @once{!! NoCaptcha::renderJs() !!}@endonce
                                 {!! NoCaptcha::display() !!}
                                 @if ($errors->has('g-recaptcha-response'))
                                     @php

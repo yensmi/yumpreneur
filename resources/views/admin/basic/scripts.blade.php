@@ -51,7 +51,7 @@
                                      </div>
                                      <div class="form-group">
                                          <label>{{ __('AWS Secret Access Key*') }}</label>
-                                         <input type="text" class="form-control" name="aws_secret_access_key" value="{{ $bs->aws_secret_access_key }}">
+                                         <input type="password" class="form-control" name="aws_secret_access_key" value="" placeholder="Leave blank to keep current">
 
                                          @if ($errors->has('aws_secret_access_key'))
                                              <p class="mt-1 mb-0 text-danger">{{ $errors->first('aws_secret_access_key') }}</p>
@@ -112,7 +112,7 @@
                       </div>
                       <div class="form-group">
                          <label>{{__('Google Recaptcha Secret key')}}</label>
-                         <input class="form-control" name="google_recaptcha_secret_key" value="{{$data->google_recaptcha_secret_key}}">
+                         <input class="form-control" type="password" name="google_recaptcha_secret_key" value="" placeholder="Leave blank to keep current">
                          @if ($errors->has('google_recaptcha_secret_key'))
                          <p class="mb-0 text-danger">{{$errors->first('google_recaptcha_secret_key')}}</p>
                          @endif

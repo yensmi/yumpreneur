@@ -275,6 +275,7 @@ Route::group(['middleware' => 'Demo'], function () {
 
         Route::get('/mail-from-admin', [EmailController::class, 'mailFromAdmin'])->name('admin.mailFromAdmin');
         Route::post('/mail-from-admin/update', [EmailController::class, 'updateMailFromAdmin'])->name('admin.mailfromadmin.update');
+        Route::post('/mail-from-admin/test', [EmailController::class, 'testMail'])->name('admin.mailfromadmin.test');
         Route::get('/mail-to-admin', [EmailController::class, 'mailToAdmin'])->name('admin.mailToAdmin');
         Route::post('/mail-to-admin/update', [EmailController::class, 'updateMailToAdmin'])->name('admin.mailtoadmin.update');
         Route::get('/mail_templates', [MailTemplateController::class, 'mailTemplates'])->name('admin.mail_templates');

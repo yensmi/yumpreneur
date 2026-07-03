@@ -19,9 +19,35 @@ class MegaMailer
 
     use UserCurrentLanguageTrait;
 
+    private function sendViaBrevo($be, string $toEmail, string $subject, string $htmlContent, ?string $toName = ''): bool
+    {
+        $payload = json_encode([
+            'sender'      => ['email' => $be->from_mail, 'name' => $be->from_name],
+            'to'          => [['email' => $toEmail, 'name' => $toName ?? '']],
+            'subject'     => $subject,
+            'htmlContent' => $htmlContent,
+        ]);
+        $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json', 'api-key: ' . $be->smtp_password],
+            CURLOPT_POSTFIELDS     => $payload,
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($httpCode >= 400) {
+            $err = json_decode($response, true);
+            Session::flash('error', $err['message'] ?? 'Brevo API error');
+            return false;
+        }
+        return true;
+    }
+
     public function mailFromAdmin($data)
     {
-       
+
         $temp = EmailTemplate::query()
             ->where('email_type', '=', $data['templateType'])
             ->first();
@@ -90,6 +116,13 @@ class MegaMailer
 
         $be = $currentLang->basic_extended;
 
+        if ($be->is_smtp == 2) {
+            $this->sendViaBrevo($be, $data['toMail'], $temp->email_subject, $body);
+            if (array_key_exists('membership_invoice', $data)) {
+                @unlink(public_path('assets/front/invoices/') . $data['membership_invoice']);
+            }
+            return;
+        }
 
         if (empty($be->smtp_host) || empty($be->smtp_port) || empty($be->encryption) || empty($be->smtp_username) || empty($be->smtp_password)) {
             return back();
@@ -142,6 +175,11 @@ class MegaMailer
     {
         $be = BasicExtended::query()->first();
 
+        if ($be->is_smtp == 2) {
+            $this->sendViaBrevo($be, $be->to_mail, $data['subject'], $data['body']);
+            return;
+        }
+
         if (empty($be->smtp_host) || empty($be->smtp_port) || empty($be->encryption) || empty($be->smtp_username) || empty($be->smtp_password)) {
             return back();
         }
@@ -174,7 +212,7 @@ class MegaMailer
                     ->from($fromMail, $fromName)
                     ->html($data['body'], 'text/html');
                 if (array_key_exists('attachments', $data)) {
-                    $message->addAttachment(public_path('assets/front/invoices/') . $data['attachments']); // Add 
+                    $message->addAttachment(public_path('assets/front/invoices/') . $data['attachments']); // Add
                 }
             });
         } catch (\Exception $e) {
@@ -235,16 +273,21 @@ class MegaMailer
 
         $be = $currentLang->basic_extended;
 
-
-        if (empty($be->smtp_host) || empty($be->smtp_port) || empty($be->encryption) || empty($be->smtp_username) || empty($be->smtp_password)) {
-            return back();
-        }
-
         $userClang = $this->getUserCurrentLanguage($user);
         $package = LimitCheckerHelper::currentMembershipPackage($user->id);
         $packageArray = $package->toArray();
         $userBs = $userClang->basic_setting;
         $userBe = $userClang->basic_extended;
+
+        if ($be->is_smtp == 2) {
+            $this->sendViaBrevo($be, $data['toMail'], $temp->mail_subject, $body);
+            Session::flash('success', 'The order information was sent to your email.');
+            return;
+        }
+
+        if (empty($be->smtp_host) || empty($be->smtp_port) || empty($be->encryption) || empty($be->smtp_username) || empty($be->smtp_password)) {
+            return back();
+        }
 
         if ($be->is_smtp == 1) {
             try {
@@ -322,13 +365,19 @@ class MegaMailer
     {
         $be = BasicExtended::query()->first();
 
-        if (empty($be->smtp_host) || empty($be->smtp_port) || empty($be->encryption) || empty($be->smtp_username) || empty($be->smtp_password)) {
-            return back();
-        }
-
         $userClang = $this->getUserCurrentLanguage(getUser());
         $userBs = $userClang->basic_setting;
         $userBe = $userClang->basic_extended;
+
+        if ($be->is_smtp == 2) {
+            $this->sendViaBrevo($be, $email, $data['subject'], $data['body']);
+            $this->sendViaBrevo($be, $userBe->from_mail, $data['subject'], $data['body']);
+            return;
+        }
+
+        if (empty($be->smtp_host) || empty($be->smtp_port) || empty($be->encryption) || empty($be->smtp_username) || empty($be->smtp_password)) {
+            return back();
+        }
 
         if ($be->is_smtp == 1) {
             try {
@@ -391,6 +440,11 @@ class MegaMailer
         $userClang = $this->getUserCurrentLanguage(getUser());
         $userBs = $userClang->basic_setting;
         $userBe = $userClang->basic_extended;
+
+        if ($be->is_smtp == 2) {
+            $this->sendViaBrevo($be, $userBe->from_mail, $data['subject'], $data['body']);
+            return;
+        }
 
         if (empty($be->smtp_host) || empty($be->smtp_port) || empty($be->encryption) || empty($be->smtp_username) || empty($be->smtp_password)) {
             return back();

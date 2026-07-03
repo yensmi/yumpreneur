@@ -233,10 +233,12 @@ class BasicController extends Controller
 
         foreach ($bss as $bs) {
 
-            $bs->aws_access_key_id = $request->aws_access_key_id; 
-            $bs->aws_secret_access_key = $request->aws_secret_access_key; 
-            $bs->aws_default_region = $request->aws_default_region; 
-            $bs->aws_bucket = $request->aws_bucket; 
+            $bs->aws_access_key_id     = $request->aws_access_key_id;
+            if ($request->filled('aws_secret_access_key')) {
+                $bs->aws_secret_access_key = $request->aws_secret_access_key;
+            }
+            $bs->aws_default_region    = $request->aws_default_region;
+            $bs->aws_bucket            = $request->aws_bucket;
 
             $bs->tawkto_chat_link = $request->tawkto_chat_link;
             $bs->is_tawkto = $request->is_tawkto;
@@ -247,7 +249,9 @@ class BasicController extends Controller
 
             $bs->is_recaptcha = $request->is_recaptcha;
             $bs->google_recaptcha_site_key = $request->google_recaptcha_site_key;
-            $bs->google_recaptcha_secret_key = $request->google_recaptcha_secret_key;
+            if ($request->filled('google_recaptcha_secret_key')) {
+                $bs->google_recaptcha_secret_key = $request->google_recaptcha_secret_key;
+            }
 
             $bs->is_whatsapp = $request->is_whatsapp;
             $bs->whatsapp_number = $request->whatsapp_number;

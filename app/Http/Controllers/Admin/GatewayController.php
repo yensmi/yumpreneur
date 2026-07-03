@@ -42,9 +42,10 @@ class GatewayController extends Controller
         $paypal = PaymentGateway::find(15);
         $paypal->status = $request->status;
 
+        $existing = json_decode($paypal->information, true) ?? [];
         $information = [];
-        $information['client_id'] = $request->client_id;
-        $information['client_secret'] = $request->client_secret;
+        $information['client_id']     = $request->filled('client_id')     ? $request->client_id     : ($existing['client_id'] ?? '');
+        $information['client_secret'] = $request->filled('client_secret') ? $request->client_secret : ($existing['client_secret'] ?? '');
         $information['sandbox_check'] = $request->sandbox_check;
         $information['text'] = "Pay via your PayPal account.";
 

@@ -146,7 +146,7 @@ class RegisterUserController extends Controller
 
             $package = Package::query()->find($request['package_id']);
             $be = BasicExtended::query()->first();
-            $bs = BasicSetting::query()->select('website_title')->first();
+            $bs = BasicSetting::query()->first();
             $transaction_id = UserPermissionHelper::uniqueId(8);
 
             $startDate = Carbon::today()->format('Y-m-d');
@@ -184,13 +184,16 @@ class RegisterUserController extends Controller
                 'permissions' => json_encode($features)
             ]);
             User\BasicSetting::create([
-                'base_color' => 'D3A971',
-                'language_id' => $lang->id,
-                'user_id' => $user->id,
-                'home_version' => 'slider',
-                'support_email' => $user->email,
-                'support_phone' => $user->phone,
-                'website_title' => $user->username,
+                'base_color'                  => 'D3A971',
+                'language_id'                 => $lang->id,
+                'user_id'                     => $user->id,
+                'home_version'                => 'slider',
+                'support_email'               => $user->email,
+                'support_phone'               => $user->phone,
+                'website_title'               => $user->username,
+                'is_recaptcha'                => $bs->is_recaptcha ?? 0,
+                'google_recaptcha_site_key'   => $bs->google_recaptcha_site_key ?? null,
+                'google_recaptcha_secret_key' => $bs->google_recaptcha_secret_key ?? null,
             ]);
 
             PageHeading::create([
